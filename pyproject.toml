@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "wordle-bot"
+version = "0.1.0"
+description = "A Discord bot implementing the popular word game \"Wordle\""
+authors = ["Thelnar <jeffreymaher96@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+discord = "^1.7.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+pre-commit = "^2.16.0"
+black = "^21.11b1"
+flake8 = "^4.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 79
+
+[flake8]
+max-line-length = 79
