@@ -1,2 +1,9 @@
+# githubignore folder and contents
 githubignore
 githubignore/*
+
+# config file(s) for storing keys, tokens, and the like
+config*
+
+# log file(s), excluded for cleanliness
+*.log
