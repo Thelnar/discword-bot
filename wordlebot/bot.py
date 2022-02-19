@@ -25,8 +25,10 @@ async def on_ready():
 @client.event
 @alog
 async def on_message(message):
-    message_matters = False
-    message_matters = (message.author != client.user) and (client.user in message.mentions or '<@&938244081727979580>' in message.content)
+    message_matters = (message.author != client.user) and \
+                        (client.user in message.mentions or \
+                        '<@&938244081727979580>' in message.content or \
+                        message.channel.type == discord.ChannelType.private)
     if not message_matters:
         return f"Message didn't matter."
         # return f"""Message didn't matter:
