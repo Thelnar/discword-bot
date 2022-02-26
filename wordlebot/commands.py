@@ -25,7 +25,7 @@ def acodexed(pattern):
             try:
                 await func(*args, **kwargs)
             except Exception as e:
-                wordle_logger.exception(f"Exception raised in {func.__name__}. exception: {str(e)}")
+                wordle_logger.exception(f"Exception: {str(e)}")
                 raise e
         return wrapper
     return overwrapper
@@ -104,6 +104,12 @@ async def func_play_day(client, message, match):
     if not (-1 < day_num < len(c.WORDLE_ANSWERS)):
         reply = "that is an invalid day number."
     if reply == None:
-        reply = f"placeholder: day {day_num}, strat {strat}" #  wordle_it_out(c.WORDLE_ANSWERS[day_num], strat, c.DEFAULT_EMOJIS)
-        reply = game.play_wordle(c.WORDLE_ANSWERS[day_num],strat=game.STRAT_CODEX[strat])
+        # reply = f"placeholder: day {day_num}, strat {strat}" #  wordle_it_out(c.WORDLE_ANSWERS[day_num], strat, c.DEFAULT_EMOJIS)
+        game_answer = c.WORDLE_ANSWERS[day_num]
+        game_result = game.play_wordle(game_answer,strat=game.STRAT_CODEX[strat])
+        tries = 'X'
+        if game_result[-1][0] == game_answer:
+            tries = str(len(game_result))
+        reply = f'Wordle {day_num} {tries}/6*\n\n'
+        reply += game.log_to_text(game_result)
     return await areact_reply(message,react,reply)
