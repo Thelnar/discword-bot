@@ -92,8 +92,9 @@ async def func_play_day(client, message, match):
     day_num = 0
     react = None
     reply = None
+    today_day = (datetime.date.today() - datetime.date.fromisoformat(c.WORDLE_DAY_ZERO)).days
     if when[-1] in 'Yy':
-        day_num = (datetime.date.today() - datetime.date.fromisoformat(c.WORDLE_DAY_ZERO)).days
+        day_num = today_day
         if when[0] in 'Yy':
             day_num -= 1
     else: 
@@ -101,7 +102,8 @@ async def func_play_day(client, message, match):
             day_num = int(when)
         except ValueError as e:
             reply = "I didn't understand which day you wanted me to play"
-    if not (-1 < day_num < len(c.WORDLE_ANSWERS)):
+    if (not (-1 < day_num < (datetime.date.today() - datetime.date.fromisoformat(c.WORDLE_DAY_ZERO)).days)) or \
+       (not (-1 < day_num < len(c.WORDLE_ANSWERS)) and message.author.id == c.DISCORD_OPERATOR_ID):
         reply = "that is an invalid day number."
     if reply == None:
         # reply = f"placeholder: day {day_num}, strat {strat}" #  wordle_it_out(c.WORDLE_ANSWERS[day_num], strat, c.DEFAULT_EMOJIS)
