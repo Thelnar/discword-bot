@@ -82,36 +82,47 @@ async def func_fuck_off(client, message, match):
 
 @acodexed(re.compile(r"""
                     (?:^|[ ]+)play                                                                       # play command
-                    (?:.*?                                           (?P<when>today|yesterday|[0-9]+))?  # when opt. arg
+                    (?:.*?             ((?:\|\|)(?P<word>.+)(?:\|\|)|(?P<when>today|yesterday|[0-9]+)))? # when opt. arg
                     (?:.*?(?:strat)(?:egy)?[ ]*(?:=|:|of|is|[ ]*)[ ]*(?P<strategy>[a-z_]+))?             # strategy kwarg
                     .*?$""", flags=re.IGNORECASE|re.VERBOSE|re.DOTALL))
 @alog
 async def func_play_day(client, message, match):
+    word = match.group('word')
     when = match.group('when') or 'Today'
     strat = match.group('strategy') or 'default'
+    game_answer = ''
     day_num = 0
     react = None
     reply = None
-    today_day = (datetime.date.today() - datetime.date.fromisoformat(c.WORDLE_DAY_ZERO)).days
-    if when[-1] in 'Yy':
-        day_num = today_day
-        if when[0] in 'Yy':
-            day_num -= 1
-    else: 
-        try:
-            day_num = int(when)
-        except ValueError as e:
-            reply = "I didn't understand which day you wanted me to play"
-    if (not (-1 < day_num < (datetime.date.today() - datetime.date.fromisoformat(c.WORDLE_DAY_ZERO)).days)) or \
-       (not (-1 < day_num < len(c.WORDLE_ANSWERS)) and message.author.id == c.DISCORD_OPERATOR_ID):
-        reply = "that is an invalid day number."
+    if word:
+        if word in c.WORDLE_LEXICON:
+            game_answer = word
+        else:
+            reply = f'{word} is not a word I recognize'
+    else:
+        today_day = (datetime.date.today() - datetime.date.fromisoformat(c.WORDLE_DAY_ZERO)).days
+        if when[-1] in 'Yy':
+            day_num = today_day
+            if when[0] in 'Yy':
+                day_num -= 1
+        else: 
+            try:
+                day_num = int(when)
+            except ValueError as e:
+                reply = "I didn't understand which day you wanted me to play"
+        if not ((-1 < day_num <= today_day) or \
+        ((-1 < day_num < len(c.WORDLE_ANSWERS)) and message.author.id == c.DISCORD_OPERATOR_ID)):
+            reply = "that is an invalid day number."
+        game_answer = c.WORDLE_ANSWERS[day_num]
     if reply == None:
         # reply = f"placeholder: day {day_num}, strat {strat}" #  wordle_it_out(c.WORDLE_ANSWERS[day_num], strat, c.DEFAULT_EMOJIS)
-        game_answer = c.WORDLE_ANSWERS[day_num]
         game_result = game.play_wordle(game_answer,strat=game.STRAT_CODEX[strat])
         tries = 'X'
         if game_result[-1][0] == game_answer:
             tries = str(len(game_result))
-        reply = f'Wordle {day_num} {tries}/6*\n\n'
+        if word:
+            reply = f'Wordle ||{word}|| {tries}/6*\n\n'
+        else:
+            reply = f'Wordle {day_num} {tries}/6*\n\n'
         reply += game.log_to_text(game_result)
     return await areact_reply(message,react,reply)
